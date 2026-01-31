@@ -152,28 +152,28 @@ def html_to_flowables(html_content, styles):
         result = []
         
         if elem.name == 'p':
-            text = elem.get_text(strip=True)
+            text = elem.get_text(separator=' ', strip=True)
             if text:
                 result.append(Paragraph(text, styles['ColumnBody']))
         
         elif elem.name in ['h1', 'h2']:
-            text = elem.get_text(strip=True)
+            text = elem.get_text(separator=' ', strip=True)
             if text:
                 result.append(Paragraph(text, styles['ArticleHeading']))
         
         elif elem.name == 'h3':
-            text = elem.get_text(strip=True)
+            text = elem.get_text(separator=' ', strip=True)
             if text:
                 result.append(Paragraph(text, styles['ArticleSubheading']))
         
         elif elem.name == 'blockquote':
-            text = elem.get_text(strip=True)
+            text = elem.get_text(separator=' ', strip=True)
             if text:
                 result.append(Paragraph(text, styles['Quote']))
         
         elif elem.name in ['ul', 'ol']:
             for li in elem.find_all('li', recursive=False):
-                text = li.get_text(strip=True)
+                text = li.get_text(separator=' ', strip=True)
                 if text:
                     # Simple bullet point
                     bullet = '•' if elem.name == 'ul' else f"{len(result)+1}."
