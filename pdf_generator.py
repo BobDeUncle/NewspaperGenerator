@@ -122,6 +122,22 @@ def html_to_flowables(html_content, styles):
     # Remove subscription widgets:
     for tag in soup.find_all('div', class_='subscription-widget-wrap'):
         tag.decompose()
+
+    # Remove References sections:
+    for h_tag in soup.find_all(['h1', 'h2', 'h3']):
+        if h_tag.get_text(strip=True).lower() == 'references':
+            # Delete everything between this heading and the next heading (or end)
+            current = h_tag.next_sibling
+            while current:
+                next_sibling = current.next_sibling
+                if hasattr(current, 'name') and current.name in ['h1', 'h2', 'h3']:
+                    break
+                if hasattr(current, 'decompose'):
+                    current.decompose()
+                current = next_sibling
+            # Delete the References heading itself
+            h_tag.decompose()
+            break
     
     # Process top-level elements
     def process_element(elem):
