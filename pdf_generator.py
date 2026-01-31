@@ -118,6 +118,10 @@ def html_to_flowables(html_content, styles):
     # Remove unwanted tags
     for tag in soup.find_all(['script', 'style', 'button', 'form', 'nav']):
         tag.decompose()
+
+    # Remove subscription widgets:
+    for tag in soup.find_all('div', class_='subscription-widget-wrap'):
+        tag.decompose()
     
     # Process top-level elements
     def process_element(elem):
