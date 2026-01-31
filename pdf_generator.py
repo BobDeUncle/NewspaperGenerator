@@ -285,7 +285,7 @@ def generate_newspaper_pdf(articles, output_path, debug=False):
         
         # Article divider (except for first)
         if i > 0:
-            story.append(Spacer(1, 0.5*cm))
+            story.append(Spacer(1, 0.05*cm))
             story.append(HRFlowable(width="100%", thickness=1, color=colors.black))
             story.append(Spacer(1, 0.3*cm))
         
@@ -298,6 +298,7 @@ def generate_newspaper_pdf(articles, output_path, debug=False):
         story.append(Paragraph(meta_text, styles['ArticleMeta']))
         
         # Add line under metadata
+        story.append(Spacer(1, 0.2*cm))
         story.append(HRFlowable(width="100%", thickness=1, color=colors.black))
         story.append(Spacer(1, 0.3*cm))
         
