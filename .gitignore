@@ -1,0 +1,9 @@
+# Python
+__pycache__/
+*.pyc
+
+# Output files
+Newspapers/
+
+# Personal URL lists
+urls.txt
