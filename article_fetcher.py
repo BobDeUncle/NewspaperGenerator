@@ -22,6 +22,14 @@ def fetch_substack_article(url):
     response.raise_for_status()
     
     soup = BeautifulSoup(response.text, 'html.parser')
+
+    # If this is a reader view URL, find the canonical article URL and re-fetch
+    if '/home/post/' in url:
+        canonical_link = soup.find('link', rel='canonical')
+        if canonical_link and canonical_link.get('href'):
+            canonical_url = canonical_link.get('href')
+            print(f"DEBUG: Reader view detected, redirecting to canonical URL: {canonical_url}")
+            return fetch_substack_article(canonical_url)  # Recursive call with real URL
     
     # Extract title
     title = None
@@ -34,30 +42,32 @@ def fetch_substack_article(url):
         if title_tag:
             title = title_tag.get_text(strip=True)
     
-    # Extract author - the author name appears as a link early in the page
+    # Extract author and publication
     author = None
     publication = None
-    
-    # Find all links in the header area
-    for link in soup.find_all('a', href=True, limit=20):
-        href = link.get('href')
+
+    # Publication name - h1 title with link to home
+    pub_heading = soup.find('h1', class_=lambda c: c and 'title' in c)
+    if pub_heading:
+        pub_link = pub_heading.find('a', href='/')
+        if pub_link:
+            publication = pub_link.get_text(strip=True)
+            # Fallback: check for img alt if text is empty
+            if not publication:
+                img = pub_link.find('img', alt=True)
+                if img and img.get('alt'):
+                    publication = img.get('alt')
+
+    # Author name - link to @username profile with non-empty text
+    author_links = soup.find_all('a', href=lambda h: h and h.startswith('https://substack.com/@'))
+    for link in author_links:
         text = link.get_text(strip=True)
-        
-        # Author profile links contain @username
-        if href.startswith('https://substack.com/@') or '/@' in href:
-            if text and text not in ['Subscribe', 'Sign in', 'Share', 'Substack']:
-                author = text
-                break
-    
-    # Try to get publication name from the home link at top
-    home_link = soup.find('a', href='/')
-    if home_link:
-        pub_text = home_link.get_text(strip=True)
-        if pub_text and pub_text not in ['Subscribe', 'Sign in', 'Substack'] and pub_text != author:
-            publication = pub_text
-    
+        if text:
+            author = text
+            break
+
     # Format author string
-    if author and publication:
+    if author and publication and author != publication:
         author = f"Written by {author} from {publication}"
     elif author:
         author = f"Written by {author}"
