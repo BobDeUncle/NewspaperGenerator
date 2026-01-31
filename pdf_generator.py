@@ -5,7 +5,7 @@ from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import cm
 from reportlab.lib.enums import TA_JUSTIFY, TA_CENTER
-from reportlab.platypus import BaseDocTemplate, Frame, PageTemplate, Paragraph, Spacer, PageBreak, KeepTogether
+from reportlab.platypus import BaseDocTemplate, Frame, PageTemplate, Paragraph, Spacer, PageBreak, KeepTogether, FrameBreak
 from reportlab.platypus.flowables import HRFlowable
 from reportlab.lib import colors
 from bs4 import BeautifulSoup
@@ -271,6 +271,10 @@ def generate_newspaper_pdf(articles, output_path, debug=False):
     
     # Add articles
     for i, article in enumerate(articles):
+        # Force new column for each article (except first)
+        if i > 0:
+            story.append(FrameBreak())
+        
         # Article divider (except for first)
         if i > 0:
             story.append(Spacer(1, 0.5*cm))
@@ -284,6 +288,10 @@ def generate_newspaper_pdf(articles, output_path, debug=False):
         if article.get('date'):
             meta_text += f" • {article['date']}"
         story.append(Paragraph(meta_text, styles['ArticleMeta']))
+        
+        # Add line under metadata
+        story.append(HRFlowable(width="100%", thickness=1, color=colors.black))
+        story.append(Spacer(1, 0.3*cm))
         
         # Article content
         content_flowables = html_to_flowables(article['content_html'], styles)
