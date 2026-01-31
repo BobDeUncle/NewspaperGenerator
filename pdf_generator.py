@@ -123,6 +123,14 @@ def html_to_flowables(html_content, styles):
     for tag in soup.find_all('div', class_='subscription-widget-wrap'):
         tag.decompose()
 
+    # Remove buttons
+    for tag in soup.find_all('p', class_='button-wrapper'):
+        tag.decompose()
+    
+    # Remove footnotes
+    for tag in soup.find_all('div', class_='footnote'):
+        tag.decompose()
+
     # Remove References sections:
     for h_tag in soup.find_all(['h1', 'h2', 'h3']):
         if h_tag.get_text(strip=True).lower() == 'references':
