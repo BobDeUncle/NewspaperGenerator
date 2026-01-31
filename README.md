@@ -97,6 +97,10 @@ Uses ReportLab's `BaseDocTemplate` with three `Frame` objects per page. Text flo
 
 The fetcher tries `trafilatura` for non-Substack URLs, which works well for most news sites and blogs.
 
+## Further Improvements
+
+Non-Substack articles have had limited testing and may not work well, if at all. When I find myself reading more articles off Substack I will get this sorted but for now it's in a half-baked state.
+
 ## Contributing
 
 Issues and pull requests welcome! This is a weekend project built quickly with AI to scratch a personal itch.
