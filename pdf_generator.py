@@ -330,18 +330,31 @@ def generate_newspaper_pdf(articles, output_path, debug=False):
     story.append(Paragraph(today, styles['NewspaperDate']))
     story.append(HRFlowable(width="100%", thickness=2, color=colors.black))
     story.append(Spacer(1, 0.3*cm))
+
+    # Table of Contents
+    story.append(Paragraph('TABLE OF CONTENTS', styles['ArticleHeading']))
+    story.append(Spacer(1, 0.3*cm))
+
+    for i, article in enumerate(articles, 1):
+        # Article number and title
+        toc_entry = f"{i}. {article['title']}"
+        story.append(Paragraph(toc_entry, styles['ColumnBody']))
+        
+        # Optional: add author under title
+        author_line = f"    {article['author']}"
+        story.append(Paragraph(author_line, styles['ArticleMeta']))
+        
+        story.append(Spacer(1, 0.2*cm))
     
     # Add articles
     for i, article in enumerate(articles):
-        # Force new column for each article (except first)
-        if i > 0:
-            story.append(FrameBreak())
+        # Force new column for each article
+        story.append(FrameBreak())
         
-        # Article divider (except for first)
-        if i > 0:
-            story.append(Spacer(1, 0.05*cm))
-            story.append(HRFlowable(width="100%", thickness=1, color=colors.black))
-            story.append(Spacer(1, 0.3*cm))
+        # Article divider
+        story.append(Spacer(1, 0.05*cm))
+        story.append(HRFlowable(width="100%", thickness=1, color=colors.black))
+        story.append(Spacer(1, 0.3*cm))
         
         # Article title and metadata
         story.append(Paragraph(article['title'], styles['ArticleTitle']))
