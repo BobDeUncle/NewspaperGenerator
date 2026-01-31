@@ -7,10 +7,13 @@ from reportlab.lib.units import cm
 from reportlab.lib.enums import TA_JUSTIFY, TA_CENTER
 from reportlab.platypus import BaseDocTemplate, Frame, PageTemplate, Paragraph, Spacer, PageBreak, KeepTogether, FrameBreak
 from reportlab.platypus.flowables import HRFlowable
+from reportlab.platypus import Image as RLImage
+from io import BytesIO
 from reportlab.lib import colors
 from bs4 import BeautifulSoup
 from datetime import datetime
 import re
+import requests
 
 
 def create_styles():
@@ -106,6 +109,18 @@ def create_styles():
         spaceAfter=0.3*cm,
         alignment=TA_JUSTIFY
     ))
+
+    # Image
+    styles.add(ParagraphStyle(
+        name='ImageCaption',
+        parent=styles['Normal'],
+        fontSize=9,
+        fontName='Times-Italic',
+        alignment=TA_CENTER,
+        textColor=colors.HexColor('#666666'),
+        spaceAfter=0.3*cm,
+        spaceBefore=0.1*cm
+    ))
     
     return styles
 
@@ -180,10 +195,49 @@ def html_to_flowables(html_content, styles):
                     result.append(Paragraph(f"{bullet} {text}", styles['ColumnBody']))
         
         elif elem.name == 'div':
-            # Process children
-            for child in elem.children:
-                if hasattr(child, 'name'):
-                    result.extend(process_element(child))
+            # Check if this is a Substack image container (has img but is not just a wrapper)
+            if 'captioned-image-container' in elem.get('class', []):
+                img = elem.find('img')
+                if img:
+                    src = img.get('src')
+                    if src and not src.startswith('data:'):
+                        try:
+                            response = requests.get(src, timeout=10)
+                            response.raise_for_status()
+                            img_bytes = BytesIO(response.content)
+                            
+                            # Create image
+                            max_width = 5.5 * cm
+                            img_obj = RLImage(img_bytes)
+                            
+                            # Scale to fit column
+                            aspect = img_obj.imageHeight / img_obj.imageWidth
+                            img_obj.drawWidth = max_width
+                            img_obj.drawHeight = max_width * aspect
+                            
+                            # Max height constraint
+                            max_height = 8 * cm
+                            if img_obj.drawHeight > max_height:
+                                img_obj.drawHeight = max_height
+                                img_obj.drawWidth = max_height / aspect
+                            
+                            result.append(img_obj)
+                            
+                            # Look for figcaption
+                            figcaption = elem.find('figcaption')
+                            if figcaption:
+                                caption_text = figcaption.get_text(separator=' ', strip=True)
+                                if caption_text:
+                                    result.append(Paragraph(caption_text, styles['ImageCaption']))
+                            
+                        except Exception as e:
+                            print(f"  → Failed to embed image {src}: {e}")
+                # Don't process children - we handled this container
+            else:
+                # Normal div - process children
+                for child in elem.children:
+                    if hasattr(child, 'name'):
+                        result.extend(process_element(child))
         
         return result
     
