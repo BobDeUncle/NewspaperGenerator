@@ -42,8 +42,6 @@ python make_newspaper.py urls.txt
 
 3. Your PDF will be saved as `Newspapers/YYYY-MM-DD.pdf` (e.g., `Newspapers/2026-01-31.pdf`)
 
-4. Print and enjoy!
-
 ### Custom output filename
 
 ```bash
@@ -103,7 +101,7 @@ Non-Substack articles have had limited testing and may not work well, if at all.
 
 ## Contributing
 
-Issues and pull requests welcome! This is a weekend project built quickly with AI to scratch a personal itch.
+Issues and pull requests welcome. This is a weekend project built quickly with AI to scratch a personal itch.
 
 ## License
 
