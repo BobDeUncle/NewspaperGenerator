@@ -124,6 +124,15 @@ def create_styles():
     
     return styles
 
+def add_page_number(canvas, doc):
+    """Add page number to footer"""
+    page_num = canvas.getPageNumber()
+    text = f"{page_num}"
+    canvas.saveState()
+    canvas.setFont('Times-Roman', 9)
+    canvas.drawCentredString(A4[0] / 2, 0.8*cm, text)
+    canvas.restoreState()
+
 
 def html_to_flowables(html_content, styles):
     """Convert HTML content to ReportLab flowables"""
@@ -315,7 +324,7 @@ def generate_newspaper_pdf(articles, output_path, debug=False):
     ]
     
     # Create page template
-    template = PageTemplate(id='ThreeColumn', frames=frames)
+    template = PageTemplate(id='ThreeColumn', frames=frames, onPage=add_page_number)
     doc.addPageTemplates([template])
     
     # Create styles
