@@ -185,7 +185,7 @@ def html_to_flowables(html_content, styles):
             if text:
                 result.append(Paragraph(text, styles['ArticleHeading']))
         
-        elif elem.name == 'h3':
+        elif elem.name in ['h3', 'h4', 'h5', 'h6']:
             text = elem.get_text(separator=' ', strip=True)
             if text:
                 result.append(Paragraph(text, styles['ArticleSubheading']))
