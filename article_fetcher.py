@@ -71,6 +71,8 @@ def fetch_substack_article(url):
         author = f"Written by {author} from {publication}"
     elif author:
         author = f"Written by {author}"
+    elif publication:
+        author = f"From {publication}"
     else:
         author = "Unknown Author"
     
