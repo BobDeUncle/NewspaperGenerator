@@ -109,6 +109,62 @@ def fetch_substack_article(url):
         'url': url
     }
 
+def is_aeon_url(url):
+    """Check if URL is an Aeon article"""
+    return 'aeon.co' in url
+
+def fetch_aeon_article(url):
+    """
+    Fetch an Aeon article using web scraping.
+    """
+    response = requests.get(url, headers={
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+    }, timeout=10)
+    response.raise_for_status()
+    
+    soup = BeautifulSoup(response.text, 'html.parser')
+    
+    # Extract title - it's in an h2 with specific classes
+    title = None
+    title_tag = soup.find('h2', class_=lambda c: c and 'font-serif' in c)
+    if title_tag:
+        title = title_tag.get_text(strip=True)
+    
+    # Extract author - in aside section
+    author = None
+    author_link = soup.find('a', href=lambda h: h and h.startswith('/users/'))
+    if author_link:
+        author = author_link.get_text(strip=True)
+    
+    # Extract date - in a p tag with specific format
+    date = None
+    date_tag = soup.find('div', class_=lambda c: c and 'font-mono' in c and 'text-grey-mid-light' in c)
+    if date_tag:
+        date = date_tag.get_text(strip=True)
+    
+    # Extract content - main article is in div with id="article-content"
+    content_html = ""
+    content_div = soup.find('div', id='article-content')
+    
+    if content_div:
+        # Remove unwanted elements
+        for tag in content_div.find_all(['script', 'style', 'button', 'form']):
+            tag.decompose()
+        
+        # Remove newsletter signup
+        for tag in content_div.find_all('div', class_='NLFormInsertFromCMS'):
+            tag.decompose()
+        
+        content_html = str(content_div)
+    
+    return {
+        'title': title or 'Untitled',
+        'author': author or 'Unknown Author',
+        'date': date or '',
+        'content_html': content_html,
+        'url': url
+    }
+
 
 def fetch_general_article(url):
     """
@@ -188,9 +244,11 @@ def fetch_general_article(url):
 def fetch_article(url):
     """
     Fetch an article from any URL.
-    Automatically detects Substack vs general web articles.
+    Automatically detects Substack vs Aeon vs general web articles.
     """
     if is_substack_url(url):
         return fetch_substack_article(url)
+    elif is_aeon_url(url):
+        return fetch_aeon_article(url)
     else:
         return fetch_general_article(url)
