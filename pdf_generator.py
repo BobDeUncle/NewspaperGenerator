@@ -181,7 +181,14 @@ def html_to_flowables(html_content, styles):
         
         if elem.name == 'p':
             text = elem.get_text(separator=' ', strip=True)
-            if text:
+            if not text:
+                return result
+
+            # Aeon pullquotes
+            classes = elem.get('class', [])
+            if 'pullquote' in classes:
+                result.append(Paragraph(text, styles['Quote']))
+            else:
                 result.append(Paragraph(text, styles['ColumnBody']))
         
         elif elem.name in ['h1', 'h2']:
