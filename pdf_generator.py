@@ -154,6 +154,10 @@ def html_to_flowables(html_content, styles):
     # Remove footnotes
     for tag in soup.find_all('div', class_='footnote'):
         tag.decompose()
+    
+    # Remove Squarespace related posts section
+    for tag in soup.find_all('div', class_='fusion-post-cards'):
+        tag.decompose()
 
     # Remove References sections:
     for h_tag in soup.find_all(['h1', 'h2', 'h3']):
