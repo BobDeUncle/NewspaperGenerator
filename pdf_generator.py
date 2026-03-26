@@ -204,8 +204,9 @@ def html_to_flowables(html_content, styles):
                     result.append(Paragraph(f"{bullet} {text}", styles['ColumnBody']))
         
         elif elem.name == 'div':
-            # Check if this is a Substack image container (has img but is not just a wrapper)
-            if 'captioned-image-container' in elem.get('class', []):
+            # Check if this is an image container (Substack or WordPress)
+            div_classes = elem.get('class', [])
+            if 'captioned-image-container' in div_classes or 'wp-caption' in div_classes:
                 img = elem.find('img')
                 if img:
                     src = img.get('src')
@@ -232,8 +233,10 @@ def html_to_flowables(html_content, styles):
                             
                             result.append(img_obj)
                             
-                            # Look for figcaption
+                            # Look for caption (figcaption for Substack, p.wp-caption-text for WordPress)
                             figcaption = elem.find('figcaption')
+                            if not figcaption:
+                                figcaption = elem.find('p', class_='wp-caption-text')
                             if figcaption:
                                 caption_text = figcaption.get_text(separator=' ', strip=True)
                                 if caption_text:
