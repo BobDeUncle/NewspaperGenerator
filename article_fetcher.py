@@ -205,6 +205,8 @@ def fetch_general_article(url):
     # Try common article containers
     content_div = None
     for selector in [
+        ('div', {'id': 'body'}),
+        ('div', {'class': 'entry-content'}),
         ('article', {}),
         ('div', {'class': 'article'}),
         ('div', {'class': 'content'}),
