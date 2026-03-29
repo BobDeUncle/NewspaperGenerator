@@ -200,10 +200,15 @@ def html_to_flowables(html_content, styles):
             if not text:
                 return result
 
-            # Aeon pullquotes
             classes = elem.get('class', [])
+
             if 'pullquote' in classes:
                 result.append(Paragraph(text, styles['Quote']))
+
+            elif 'is-style-article-bio' in classes:
+                result.append(Spacer(1, 0.3*cm))
+                result.append(Paragraph(text, styles['ArticleMeta']))
+
             else:
                 result.append(Paragraph(text, styles['ColumnBody']))
         
