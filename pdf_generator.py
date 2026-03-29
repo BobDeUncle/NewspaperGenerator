@@ -159,6 +159,22 @@ def html_to_flowables(html_content, styles):
     for tag in soup.find_all('div', class_='fusion-post-cards'):
         tag.decompose()
 
+    # Remove ads
+    for tag in soup.find_all('div', class_='ct-ad-slot'):
+        tag.decompose()
+
+    # Remove action bars / menus
+    for tag in soup.find_all('section', class_='article-action-bar'):
+        tag.decompose()
+
+    # Remove footer/share/tag sections
+    for tag in soup.find_all('div', class_='article-content-footer'):
+        tag.decompose()
+
+    # Remove sidebar
+    for tag in soup.find_all('aside'):
+        tag.decompose()
+
     # Remove References sections:
     for h_tag in soup.find_all(['h1', 'h2', 'h3']):
         if h_tag.get_text(strip=True).lower() == 'references':
