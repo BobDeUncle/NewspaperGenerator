@@ -282,6 +282,12 @@ def html_to_flowables(html_content, styles):
                 for child in elem.children:
                     if hasattr(child, 'name'):
                         result.extend(process_element(child))
+
+        elif elem.name in ['article', 'section', 'main']:
+            # Container tags - process children
+            for child in elem.children:
+                if hasattr(child, 'name'):
+                    result.extend(process_element(child))
         
         return result
     
